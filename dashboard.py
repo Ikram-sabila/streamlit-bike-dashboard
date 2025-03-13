@@ -5,8 +5,8 @@ import streamlit as st
 from babel.numbers import format_currency
 sns.set(style='dark')
 
-data_day = pd.read_csv("data_ready_day.csv")
-data_hour = pd.read_csv("data_ready_hour.csv")
+data_day = pd.read_csv("dashboard/data_ready_day.csv")
+data_hour = pd.read_csv("dashboard/data_ready_hour.csv")
 
 weather_mapping = {
     1: "Clear",
