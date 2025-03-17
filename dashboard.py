@@ -72,7 +72,7 @@ with tab2:
         st.warning("Tidak ada data untuk rentang tanggal yang dipilih!")
     else:
         fig, ax = plt.subplots(figsize=(10,6))
-        sns.barplot(x='Jam', y='Rata-rata penyewa', data=data_hour_filtered, ax=ax, palette="coolwarm")
+        sns.barplot(x='hr', y='cnt', data=data_hour_filtered, ax=ax, palette="coolwarm")
         st.pyplot(fig)
 
     rental_per_hour = data_hour_filtered.groupby("hr")["cnt"].sum().reset_index()
