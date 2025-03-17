@@ -1,3 +1,4 @@
+import datetime
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -5,8 +6,8 @@ import streamlit as st
 from babel.numbers import format_currency
 sns.set(style='dark')
 
-data_day = pd.read_csv("dashboard/data_ready_day.csv")
-data_hour = pd.read_csv("dashboard/data_ready_hour.csv")
+data_day = pd.read_csv("data_ready_day.csv")
+data_hour = pd.read_csv("data_ready_hour.csv")
 
 weather_mapping = {
     1: "Clear",
@@ -23,6 +24,8 @@ with st.sidebar:
         ["All"] + list(set(weather_mapping.values())),
         placeholder="Weather..."
     )
+    start_date = st.date_input("Start Date", datetime.datetime(2011, 1, 1))
+    end_date = st.date_input("End Date", datetime.datetime(2012, 12, 31))
 
 st.title("Dashboard")
 tab1, tab2 = st.tabs(["Cuaca dengan Penyewaan", "Distribusi Penyewaan"])
@@ -64,17 +67,18 @@ with tab1:
 
 with tab2:
     st.subheader("Distribusi Penyewaan Sepeda Berdasarkan Jam")
-    fig, ax = plt.subplots(figsize=(10,6))
-    sns.barplot(x='hr', y='cnt', data=data_hour, ax=ax, palette="coolwarm")
-    ax.set_xlabel("Jam dalam Sehari")
-    ax.set_ylabel("Jumlah Penyewaan")
-    ax.set_title("Variasi Penyewaan Sepeda di Setiap Jam")
-    st.pyplot(fig)
+    data_hour_filtered = data_hour[(data_hour['dteday'] >= str(start_date)) & (data_hour['dteday'] <= str(end_date))]
+    if data_hour_filtered.empty:
+        st.warning("Tidak ada data untuk rentang tanggal yang dipilih!")
+    else:
+        fig, ax = plt.subplots(figsize=(10,6))
+        sns.barplot(x='hr', y='cnt', data=data_hour_filtered, ax=ax, palette="coolwarm")
+        st.pyplot(fig)
 
-    rental_per_hour = data_hour.groupby("hr")["cnt"].sum().reset_index()
+    rental_per_hour = data_hour_filtered.groupby("hr")["cnt"].sum().reset_index()
 
-    peak_hour = rental_per_hour.loc[rental_per_hour["cnt"].idxmax(), "hr"]
-    low_hour = rental_per_hour.loc[rental_per_hour["cnt"].idxmin(),"hr"]
+    peak_hour = data_hour_filtered.loc[rental_per_hour["cnt"].idxmax(), "hr"]
+    low_hour = data_hour_filtered.loc[rental_per_hour["cnt"].idxmin(),"hr"]
 
     st.markdown("### Insight Penyewaan Sepeda")
     st.write(f"- Penyewaan tertinggi terjadi pada pukul **{peak_hour}:00**, kemungkinan karena jam pulang kerja atau aktivitas sore.")
