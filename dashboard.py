@@ -73,6 +73,8 @@ with tab2:
     else:
         fig, ax = plt.subplots(figsize=(10,6))
         sns.barplot(x='hr', y='cnt', data=data_hour_filtered, ax=ax, palette="coolwarm")
+        ax.set_xlabel("Jam dalam Sehari")
+        ax.set_ylabel("Jumlah Penyewaan")
         st.pyplot(fig)
 
     rental_per_hour = data_hour_filtered.groupby("hr")["cnt"].sum().reset_index()
