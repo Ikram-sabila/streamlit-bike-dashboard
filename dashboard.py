@@ -67,23 +67,29 @@ with tab1:
 
 with tab2:
     st.subheader("Distribusi Penyewaan Sepeda Berdasarkan Jam")
-    data_hour_filtered = data_hour[(data_hour['dteday'] >= str(start_date)) & (data_hour['dteday'] <= str(end_date))]
-    if data_hour_filtered.empty:
-        st.warning("Tidak ada data untuk rentang tanggal yang dipilih!")
-    else:
-        fig, ax = plt.subplots(figsize=(10,6))
-        sns.barplot(x='hr', y='cnt', data=data_hour_filtered, ax=ax, palette="coolwarm")
-        ax.set_xlabel("Jam dalam Sehari")
-        ax.set_ylabel("Jumlah Penyewaan")
-        st.pyplot(fig)
 
+# Filter berdasarkan tanggal
+data_hour_filtered = data_hour[(data_hour['dteday'] >= str(start_date)) & (data_hour['dteday'] <= str(end_date))]
+
+if data_hour_filtered.empty:
+    st.warning("Tidak ada data untuk rentang tanggal yang dipilih!")
+else:
     rental_per_hour = data_hour_filtered.groupby("hr")["cnt"].sum().reset_index()
 
-    peak_hour = data_hour_filtered.loc[rental_per_hour["cnt"].idxmax(), "hr"]
-    low_hour = data_hour_filtered.loc[rental_per_hour["cnt"].idxmin(),"hr"]
+    fig, ax = plt.subplots(figsize=(10, 5))
+    sns.barplot(x='hr', y='cnt', data=rental_per_hour, ax=ax, palette="dark:salmon_r")
+    ax.set_xlabel("Hour of the Day")
+    ax.set_ylabel("Total Bike Rentals")
+    ax.set_title("Total Bike Rentals Per Hour")
+    ax.set_xticks(range(0, 24))
+    ax.grid(axis='y', linestyle='--', alpha=0.7)
+
+    st.pyplot(fig)
+
+    peak_hour = rental_per_hour.loc[rental_per_hour["cnt"].idxmax(), "hr"]
+    low_hour = rental_per_hour.loc[rental_per_hour["cnt"].idxmin(), "hr"]
 
     st.markdown("### Insight Penyewaan Sepeda")
     st.write(f"- Penyewaan tertinggi terjadi pada pukul **{peak_hour}:00**, kemungkinan karena jam pulang kerja atau aktivitas sore.")
     st.write(f"- Penyewaan terendah terjadi pada pukul **{low_hour}:00**, menunjukkan sedikitnya pengguna saat itu.")
     st.write("- Tren menunjukkan peningkatan penggunaan di pagi dan sore hari, mencerminkan pola aktivitas harian masyarakat.")
-
